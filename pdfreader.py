@@ -1,7 +1,7 @@
 import pdfplumber as plmr
 import re
 import shutil
-from docx import Document
+import docx
 
 #Class that will read PDFs and Gather information about them
 class pdfInfo:
@@ -81,10 +81,19 @@ class createDocx:
         original = r'C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\Paper D Template.doc'
         target = r'C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\Test documents\\' + self.fileName
         shutil.copyfile(original, target)
+        self.filePath = target
 
     def changeDate(self):
-
-
+        doc = docx.Document(self.filePath)
+        for p in doc.paragraphs:
+            if '*DATE*' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '*DATE*' in inline[i].text:
+                        text = inline[i].text.replace('*DATE*', self.meetingDate)
+                        inline[i].text = text
+                print(p.text)
 
 
 pdf1 = pdfInfo('C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\304A Ware Road.pdf')
@@ -95,3 +104,4 @@ filePath = r'C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting
 date = "25 March 2022"
 paperD = createDocx(filePath, List1 , date)
 paperD.copyTemplate()
+paperD.changeDate()
