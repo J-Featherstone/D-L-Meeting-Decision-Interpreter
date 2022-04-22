@@ -2,6 +2,7 @@ import pdfplumber as plmr
 import re
 import shutil
 import docx
+import os
 
 #Class that will read PDFs and Gather information about them
 class pdfInfo:
@@ -65,27 +66,36 @@ class pdfInfo:
         self.extractInfo()
         return self.decisionList
 
+#A class to allow formatting for multiple pdfs in a certain folder. folderPath is a directory in a string with the pdfs in them
+class pdfFolder:
+    def __init__(self, folderPath):
+        self.folderPath = folderPath
+        self.allDecisionsList = []
+    
+    def getInfoFromFolder(self):
+        self.directory = os.fsendcode(self.folderPath)
+
 #class for setting up and entering information into a table in a word document.
 class createDocx:
     #filepath is the location of the word template.
     #meetingDate will be a string in the format "25 March 2022" - need a way to get this from the user.
-    def __init__(self, filePath, decisionList, meetingDate):
+    def __init__(self, decisionList, meetingDate):
         self.decisionList = decisionList
         self.meetingDate = meetingDate
-        self.fileName = "Paper D " + meetingDate + ".doc"
-        self.filePath = filePath + self.fileName
+        self.fileName = r'Paper D ' + meetingDate + r'.docx'
+        #self.filePath = filePath + self.fileName
     
 #--------------------------------------------------------------------------------------------------------------------------#
 #FilePaths will need to be altered for live use
     def copyTemplate(self):
-        original = r'C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\Paper D Template.doc'
-        target = r'C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\Test documents\\' + self.fileName
+        original = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Paper D Template.docx'
+        target = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/' + self.fileName
         shutil.copyfile(original, target)
         self.filePath = target
 
     def changeDate(self):
-        doc = docx.Document(self.filePath)
-        for p in doc.paragraphs:
+        self.doc = docx.Document(self.filePath)
+        for p in self.doc.paragraphs:
             if '*DATE*' in p.text:
                 inline = p.runs
                 # Loop added to work with runs (strings with same style)
@@ -94,14 +104,33 @@ class createDocx:
                         text = inline[i].text.replace('*DATE*', self.meetingDate)
                         inline[i].text = text
                 print(p.text)
+                self.doc.save(self.filePath)
+
+    def appendTable(self, row):
+        self.doc.tables
+        #print("Retrieved value: " + self.doc.tables[0].cell(0, 0).text)
+        #self.doc.tables[0].cell(1, 0).text = "new value1"
+        #self.doc.tables[0].add_row() #ADD ROW HERE
+        #self.doc.tables[0].cell(2, 1).text = "new value2"
+        #self.doc.tables[0].add_row()
+        #self.doc.tables[0].cell(3, 2).text = "new value3"
+
+        column = 0
+        for s in self.decisionList:
+            self.doc.tables[0].cell(row, column).text = s
+            column += 1
+        self.doc.save(self.filePath)
 
 
-pdf1 = pdfInfo('C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\304A Ware Road.pdf')
+
+
+pdf1 = pdfInfo(r'C:/Users/JoeFeatherstone/Documents\\Python Projects\\D&L Meeting Decision Interpreter\\304A Ware Road.pdf')
 #pdf1.printText()
 List1 = pdf1.getInfo()
 #print(List1)
-filePath = r'C:\\Users\\JoeFeatherstone\\Documents\\Python Projects\\D&L Meeting Decision Interpreter\\Test documents\\'
-date = "25 March 2022"
-paperD = createDocx(filePath, List1 , date)
+filePath = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/'
+date = r'25 March 2022'
+paperD = createDocx(List1 , date)
 paperD.copyTemplate()
 paperD.changeDate()
+paperD.appendTable(1)
