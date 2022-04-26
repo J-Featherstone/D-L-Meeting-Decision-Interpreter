@@ -3,6 +3,7 @@ import re
 import shutil
 import docx
 import os
+import PletstrepReader as ps
 
 #Class that will read PDFs and Gather information about them
 class pdfInfo:
@@ -51,6 +52,8 @@ class pdfInfo:
     #the job of extracting the decision from the document is trickier, so I have made an extra function for it.
     #Will search for phrases from a list in a text document that can be updated.
     def extractDecision(self):
+        #print(self.decisionPhrasesEH)((.|\n)*)
+        #print(self.text)
         for decisionPhrase in self.decisionPhrasesEH:
             if decisionPhrase in self.text:
                 self.ehDecision = decisionPhrase
@@ -68,19 +71,32 @@ class pdfInfo:
 
 #A class to allow formatting for multiple pdfs in a certain folder. folderPath is a directory in a string with the pdfs in them
 class pdfFolder:
-    def __init__(self, folderPath):
+    def __init__(self, folderPath, meetingDate):
         self.folderPath = folderPath
-        self.allDecisionsList = []
+        self.firstDecisionsList = []
+        self.meetingDate = meetingDate
     
+    #this function will iterate through the pdf files in the given folder
     def getInfoFromFolder(self):
-        self.directory = os.fsendcode(self.folderPath)
+        for file in os.listdir(self.folderPath):
+            print(file)
+            if not file.endswith(".pdf"):
+                continue
+            filePath = self.folderPath + file
+            print(filePath)
+            pdfFile = pdfInfo(filePath)
+            self.firstDecisionsList.append(pdfFile.getInfo())
+
+        pletstrep1 = ps.pletstrep(self.firstDecisionsList, self.meetingDate)
+        return pletstrep1.getHTC()
+
 
 #class for setting up and entering information into a table in a word document.
 class createDocx:
     #filepath is the location of the word template.
     #meetingDate will be a string in the format "25 March 2022" - need a way to get this from the user.
-    def __init__(self, decisionList, meetingDate):
-        self.decisionList = decisionList
+    def __init__(self, allDecisionList, meetingDate):
+        self.allDecisionList = allDecisionList
         self.meetingDate = meetingDate
         self.fileName = r'Paper D ' + meetingDate + r'.docx'
         #self.filePath = filePath + self.fileName
@@ -103,10 +119,10 @@ class createDocx:
                     if '*DATE*' in inline[i].text:
                         text = inline[i].text.replace('*DATE*', self.meetingDate)
                         inline[i].text = text
-                print(p.text)
+                #print(p.text)
                 self.doc.save(self.filePath)
 
-    def appendTable(self, row):
+    def appendTable(self):
         self.doc.tables
         #print("Retrieved value: " + self.doc.tables[0].cell(0, 0).text)
         #self.doc.tables[0].cell(1, 0).text = "new value1"
@@ -114,23 +130,30 @@ class createDocx:
         #self.doc.tables[0].cell(2, 1).text = "new value2"
         #self.doc.tables[0].add_row()
         #self.doc.tables[0].cell(3, 2).text = "new value3"
-
+        row = 1
         column = 0
-        for s in self.decisionList:
-            self.doc.tables[0].cell(row, column).text = s
-            column += 1
+        for decisionList in self.allDecisionList:
+            for s in decisionList:
+                self.doc.tables[0].cell(row, column).text = s
+                column += 1
+            row += 1
+            column = 0
+            self.doc.tables[0].add_row()
         self.doc.save(self.filePath)
 
 
 
 
-pdf1 = pdfInfo(r'C:/Users/JoeFeatherstone/Documents\\Python Projects\\D&L Meeting Decision Interpreter\\304A Ware Road.pdf')
+#pdf1 = pdfInfo(r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/304A Ware Road.pdf')
 #pdf1.printText()
-List1 = pdf1.getInfo()
+#List1 = pdf1.getInfo()
 #print(List1)
 filePath = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/'
 date = r'25 March 2022'
-paperD = createDocx(List1 , date)
+folder = pdfFolder('C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/pdf folder/', '25.04.2022')
+allDecisionsList = folder.getInfoFromFolder()
+print(allDecisionsList)
+paperD = createDocx(allDecisionsList, date)
 paperD.copyTemplate()
 paperD.changeDate()
-paperD.appendTable(1)
+paperD.appendTable()

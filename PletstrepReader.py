@@ -1,6 +1,5 @@
 import docx
 
-
 class pletstrep:
     #appList is the list containing all the current application after extracting them from the PDFs. AppNo is the first entry in each sublist
     #[[appNo, location, EHDecision, HTCDecision], ...] where HTCDesicion will be filled in here.
@@ -35,11 +34,17 @@ class pletstrep:
     def iterateTables(self, document, lastYear):
         print(document.tables[0].cell(0, 0).text)
         for count, application in enumerate(self.appList):
+            #debug code
+            print(count)
             appNo = application[0]
             for table1 in document.tables:
                 if appNo in table1.cell(0, 0).text:
                     HTCDecision = table1.cell(1, 0).text
                     print(HTCDecision)
+                    if len(self.appList[count]) < 4:
+                        self.appList[count].append("")
+                    #debug code
+                    print(self.appList)
                     self.appList[count][3] = self.processDecision(HTCDecision)
                     return True
             if lastYear == True:
@@ -72,8 +77,7 @@ class pletstrep:
 
         return self.appList
 
-pletstrep1 = pletstrep([["3/21/2739/PNHH", "", "", ""]], "25.04.2022")
+#pletstrep1 = pletstrep([["3/21/2739/PNHH", "", "", ""]], "25.04.2022")
 
-pletstrep1.getHTC()
-print(pletstrep1.appList)
-    
+#pletstrep1.getHTC()
+#print(pletstrep1.appList)
