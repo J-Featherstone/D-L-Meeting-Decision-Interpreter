@@ -30,17 +30,18 @@ class pletstrep:
         self.doc1 = docx.Document(self.latestFilePath)
         self.doc2 = docx.Document(self.lastYearFilePath)
 
-    #last year is true or false
-    def iterateTables(self, document, lastYear):
+    #last year is true or false, old version of 
+    def iterateTables2(self, document, lastYear):
         print(document.tables[0].cell(0, 0).text)
         for count, application in enumerate(self.appList):
             #debug code
-            print(count)
+            #print(count)
             appNo = application[0]
             for table1 in document.tables:
                 if appNo in table1.cell(0, 0).text:
                     HTCDecision = table1.cell(1, 0).text
                     print(HTCDecision)
+                    print(len(self.appList[count]))
                     if len(self.appList[count]) < 4:
                         self.appList[count].append("")
                     #debug code
@@ -50,6 +51,15 @@ class pletstrep:
             if lastYear == True:
                 self.appList[count][3] = "No Decision found in last two Pletstrep documents"
         return False
+
+    def iterateTables(self, pletstrepDoc, application):
+        appNo = application[0]
+        for table1 in pletstrepDoc.tables:
+            if appNo in table1.cell(0, 0).text:
+                HTCDecision = table1.cell(1, 0).text
+                return self.processDecision(HTCDecision)
+        return False
+    
     
     def processDecision(self, decision):
         decision = decision.lower()
@@ -70,11 +80,18 @@ class pletstrep:
     def getHTC(self):
         self.openDocs()
         
-        inThisYear = self.iterateTables(self.doc1, False)
-
-        if inThisYear == False:
-            self.iterateTables(self.doc2, True)
-
+        for count, application in enumerate(self.appList):
+            HTCDecision = self.iterateTables(self.doc1, application)
+            if HTCDecision == False:
+                HTCDecision = self.iterateTables(self.doc2, application)
+                if HTCDecision == False:
+                    application.append("No Decision found in last two Pletstrep documents")
+                else:
+                    application.append(HTCDecision)
+            else:
+                application.append(HTCDecision)
+            self.appList[count] = application
+                
         return self.appList
 
 #pletstrep1 = pletstrep([["3/21/2739/PNHH", "", "", ""]], "25.04.2022")

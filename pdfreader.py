@@ -55,12 +55,12 @@ class pdfInfo:
         #print(self.decisionPhrasesEH)((.|\n)*)
         #print(self.text)
         for decisionPhrase in self.decisionPhrasesEH:
-            if decisionPhrase in self.text:
+            #if decisionPhrase in self.text:
+            if re.search("((.|\n)*)" + decisionPhrase, self.text):
                 self.ehDecision = decisionPhrase
-                break
+                return True
             #In case the phrase is not in the TXT document, you will need to add it manually
-            else:
-                self.ehDecision = "Search East Herts Decision Manually"
+        #self.ehDecision = "Search East Herts Decision Manually"
 
     #This will run the above functions so you need only call one. Returns a list with the appNo, location and east herts Decision
     def getInfo(self):
