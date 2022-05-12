@@ -45,7 +45,7 @@ class pdfInfo:
         self.location = re.search(r'.+?(?= Hertford)', self.locationFull).group()
         #print(self.location)
         #find the decision by looking for key terms.
-        self.extractDecision()
+        self.ehDecision = self.extractDecision()
         #add to the decision list for extraction
         self.decisionList = [self.appNo, self.location, self.ehDecision]
 
@@ -54,11 +54,11 @@ class pdfInfo:
     def extractDecision(self):
         #print(self.decisionPhrasesEH)((.|\n)*)
         #print(self.text)
+        txtUpper = self.text.upper()
+        txtOneLine = ''.join(txtUpper.splitlines())
         for decisionPhrase in self.decisionPhrasesEH:
-            #if decisionPhrase in self.text:
-            if re.search("((.|\n)*)" + decisionPhrase, self.text):
-                self.ehDecision = decisionPhrase
-                return True
+            if decisionPhrase.upper() in txtOneLine:
+                return decisionPhrase
             #In case the phrase is not in the TXT document, you will need to add it manually
         #self.ehDecision = "Search East Herts Decision Manually"
 
