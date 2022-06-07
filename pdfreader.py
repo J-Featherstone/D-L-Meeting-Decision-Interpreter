@@ -94,17 +94,23 @@ class pdfFolder:
 #class for setting up and entering information into a table in a word document.
 class createDocx:
     #filepath is the location of the word template.
-    #meetingDate will be a string in the format "25 March 2022" - need a way to get this from the user.
+    #meetingDate will be a string in the format "25.03.2022" - will convert into "25 March 2022"
     def __init__(self, allDecisionList, meetingDate):
         self.allDecisionList = allDecisionList
         self.meetingDate = meetingDate
+        self.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         self.fileName = r'Paper D ' + meetingDate + r'.docx'
         #self.filePath = filePath + self.fileName
+
+    def formatMeetingDate(self):
+        dateList = self.meetingDate.split(".")
+        month = self.months[int(dateList[1]) - 1]
+        self.titleMeetingDate = dateList[0] + " " + month + " " + dateList[2]
     
 #--------------------------------------------------------------------------------------------------------------------------#
 #FilePaths will need to be altered for live use
     def copyTemplate(self):
-        original = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Paper D Template.docx'
+        original = r'Paper D Template.docx'
         target = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/' + self.fileName
         shutil.copyfile(original, target)
         self.filePath = target
