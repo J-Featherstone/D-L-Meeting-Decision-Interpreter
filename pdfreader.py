@@ -8,7 +8,7 @@ import PletstrepReader as ps
 #Class that will read PDFs and Gather information about them
 class pdfInfo:
 
-    #The fikePath s just where the pdf is on the computer.
+    #The filePath is just where the pdf is on the computer.
     def __init__(self, filePath):
         self.filePath = filePath
         #data that needs to be extracted from the PDF
@@ -71,8 +71,8 @@ class pdfInfo:
 
 #A class to allow formatting for multiple pdfs in a certain folder. folderPath is a directory in a string with the pdfs in them
 class pdfFolder:
-    def __init__(self, folderPath, meetingDate):
-        self.folderPath = folderPath
+    def __init__(self, meetingDate):
+        self.folderPath = r'F:/D & L Committee/PLANNING SUB/PLANS/' + meetingDate + '/Decisions ' + meetingDate + "/"
         self.firstDecisionsList = []
         self.meetingDate = meetingDate
     
@@ -99,13 +99,15 @@ class createDocx:
         self.allDecisionList = allDecisionList
         self.meetingDate = meetingDate
         self.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-        self.fileName = r'Paper D ' + meetingDate + r'.docx'
+        self.formatMeetingDate()
         #self.filePath = filePath + self.fileName
 
+    #Formats the meeting date "25.03.2050" into the format "25 March 2050"
     def formatMeetingDate(self):
         dateList = self.meetingDate.split(".")
         month = self.months[int(dateList[1]) - 1]
         self.titleMeetingDate = dateList[0] + " " + month + " " + dateList[2]
+        self.fileName = r'Paper D ' + self.titleMeetingDate + r'.docx'
     
 #--------------------------------------------------------------------------------------------------------------------------#
 #FilePaths will need to be altered for live use
@@ -123,7 +125,7 @@ class createDocx:
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '*DATE*' in inline[i].text:
-                        text = inline[i].text.replace('*DATE*', self.meetingDate)
+                        text = inline[i].text.replace('*DATE*', self.titMeetingDate)
                         inline[i].text = text
                 #print(p.text)
                 self.doc.save(self.filePath)
@@ -147,6 +149,14 @@ class createDocx:
             self.doc.tables[0].add_row()
         self.doc.save(self.filePath)
 
+def getDate():
+    Date = input("Enter date of meeting in the format dd.mm.yyyy: ")
+    matched = re.match("[0-3][0-9].[0-1][0-9].[0-9][0-9][0-9][0-9]", Date)
+    while bool(matched) == False:
+        Date = input("Please enter a valid date in the format dd.mm.yyyy: ")
+        matched = re.match("[0-3][0-9].[0-1][0-9].[0-9][0-9][0-9][0-9]", Date)
+    return Date
+
 
 
 
@@ -154,12 +164,15 @@ class createDocx:
 #pdf1.printText()
 #List1 = pdf1.getInfo()
 #print(List1)
-filePath = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/'
-date = r'25 March 2022'
-folder = pdfFolder('C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/pdf folder/', '25.04.2022')
+#filePath = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/'
+
+
+date = getDate()
+folder = pdfFolder(date)
 allDecisionsList = folder.getInfoFromFolder()
 print(allDecisionsList)
 paperD = createDocx(allDecisionsList, date)
 paperD.copyTemplate()
 paperD.changeDate()
 paperD.appendTable()
+
