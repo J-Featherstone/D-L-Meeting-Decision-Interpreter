@@ -5,22 +5,27 @@ import win32com.client
 class emails:
     def __init__(self, meetingDate):
         self.outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
-        self.inbox = self.outlook.GetDefaultFolder(6)
-        #Folders('admin@hertford.gov.uk').Folders('Inbox')
-        self.messages = self.inbox.Items
-        self.meetingFolder = meetingDate
-
-        self.folder = self.outlook.Folders.Item("Mailbox Name")
-        self.inbox = self.folder.Folders.Item("Inbox")
+        self.folder = self.outlook.Folders.Item('joe.featherstone@hertford.gov.uk')
+        self.decicisionWorkingFolder = self.folder.Folders.Item("Decision Working")
+        self.decisionArchiveFolder = self.folder.Folders.Item("Decision Archive")
+        self.msg = self.inbox.Items
+        self.msgs = self.inbox.GetLast()
+        #self.meetingFolder = meetingDate
 
         self.subject = "Planning Application Decision"
+
+    #print msgs
+    def printMsgs(self):
+        print(self.msgs)
+        print(self.msgs.subject)
 
     #meeting date in format "25.05.2020"
     def getfolder(self):
         self.meetingFolder = "F:/D & L Committee/PLANNING SUB/PLANS/" + self.meetingDate + "/decisions"
 
+
     def saveAttachments(self):
-        for message in self.messages:
+        for message in self.msgs:
             
                 body_content = message.body
                 print(body_content)
@@ -32,23 +37,12 @@ class emails:
                 #    if message.Subject == subject and message.Unread:
                 #        message.Unread = False
                 #    break
-    
-    def checkFolderNums(self):
-        for i in range(50):
-            try:
-                box = self.outlook.GetDefaultFolder(i)
-                name = box.Name
-                print(i, name)
-            except:
-                pass
-        
-
-    def PrintAccounts(self):
-        for account in self.outlook.Accounts:
             print(account.DeliveryStore.DisplayName)
+
 
 
 emailTest = emails("29.04.20")
 #emailTest.saveAttachments()
 #emailTest.checkFolderNums()
-emailTest.PrintAccounts()
+#emailTest.PrintAccounts()
+emailTest.printMsgs()
