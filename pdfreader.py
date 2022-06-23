@@ -149,6 +149,23 @@ class createDocx:
             self.doc.tables[0].add_row()
         self.doc.save(self.filePath)
 
+#this class is for creating the folders where the PDFS are to be stored
+#date in format "dd.mm.yyyy" and initial location is where the folders need to be created
+class folders:
+    def __init__(self, date, initialLocation):
+        self.date = date
+        self.initialLocation = initialLocation
+        self.locationFolderDate = self.initialLocation + "/" + self.date
+    
+    def makeFolders(self):
+        if not os.path.exists(self.locationFolderDate):
+            os.mkdir(self.locationFolderDate)
+            os.mkdir(self.locationFolderDate + "/Decisions")
+            os.mkdir(self.locationFolderDate + "/Consultations")
+            os.mkdir(self.locationFolderDate + "/Paper C")
+        else:
+            print("Folder already exists")
+
 def getDate():
     Date = input("Enter date of meeting in the format dd.mm.yyyy: ")
     matched = re.match("[0-3][0-9].[0-1][0-9].[0-9][0-9][0-9][0-9]", Date)
@@ -157,6 +174,12 @@ def getDate():
         matched = re.match("[0-3][0-9].[0-1][0-9].[0-9][0-9][0-9][0-9]", Date)
     return Date
 
+#This will wait until the user has moved the relevant PDFS into the folder then entered "Y"
+#hopefully this will be replaced with a script that gets the pdfs from the emails automatically
+def waitForPDFS():
+    confirm = input("Please enter >> y << when pdfs have been moved to the relevant decisions folder: ")
+    while confirm != "y":
+        confirm = input("Please enter >> y << when pdfs have been moved to the relevant decisions folder: ")
 
 
 
@@ -166,13 +189,16 @@ def getDate():
 #print(List1)
 #filePath = r'C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/Test documents/'
 
-
+initialLocation = "F:/D & L Committee/PLANNING SUB/PLANS"
 date = getDate()
-folder = pdfFolder(date)
-allDecisionsList = folder.getInfoFromFolder()
-print(allDecisionsList)
-paperD = createDocx(allDecisionsList, date)
-paperD.copyTemplate()
-paperD.changeDate()
-paperD.appendTable()
+newFolders = folders(date, initialLocation)
+newFolders.makeFolders()
+waitForPDFS()
+#folder = pdfFolder(date)
+#allDecisionsList = folder.getInfoFromFolder()
+#print(allDecisionsList)
+#paperD = createDocx(allDecisionsList, date)
+#paperD.copyTemplate()23
+#paperD.changeDate()
+#paperD.appendTable()
 
