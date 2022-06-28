@@ -4,6 +4,8 @@ import shutil
 import docx
 import os
 import PletstrepReader as ps
+import outlookAttachments as oa
+
 
 #Class that will read PDFs and Gather information about them
 class pdfInfo:
@@ -193,12 +195,14 @@ initialLocation = "F:/D & L Committee/PLANNING SUB/PLANS"
 date = getDate()
 newFolders = folders(date, initialLocation)
 newFolders.makeFolders()
-waitForPDFS()
-#folder = pdfFolder(date)
-#allDecisionsList = folder.getInfoFromFolder()
-#print(allDecisionsList)
-#paperD = createDocx(allDecisionsList, date)
-#paperD.copyTemplate()23
-#paperD.changeDate()
-#paperD.appendTable()
 
+email1 = oa.emails(date)
+email1.saveAttachments()
+#waitForPDFS()
+PDFs = pdfFolder(date)
+allDecisionsList = PDFs.getInfoFromFolder()
+#print(allDecisionsList)
+paperD = createDocx(allDecisionsList, date)
+paperD.copyTemplate()
+paperD.changeDate()
+paperD.appendTable()
