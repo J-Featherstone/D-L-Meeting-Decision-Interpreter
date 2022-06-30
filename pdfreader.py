@@ -20,6 +20,7 @@ class pdfInfo:
         #creates the decisionPhrasesEH list with
         with open('EHDC Decision Phrases.txt', 'r') as f:
             self.decisionPhrasesEH = [line.strip() for line in f]
+        #print(self.decisionPhrasesEH)
 
     #The PDF file in plaintext, ready for processing information
     
@@ -57,10 +58,12 @@ class pdfInfo:
         #print(self.decisionPhrasesEH)((.|\n)*)
         #print(self.text)
         txtUpper = self.text.upper()
-        txtOneLine = ''.join(txtUpper.splitlines())
+        txtOneLine = ' '.join(txtUpper.split())
+        #print(txtOneLine)
         for decisionPhrase in self.decisionPhrasesEH:
             if decisionPhrase.upper() in txtOneLine:
                 return decisionPhrase
+        return "New Decision"       
             #In case the phrase is not in the TXT document, you will need to add it manually
         #self.ehDecision = "Search East Herts Decision Manually"
 
@@ -74,7 +77,7 @@ class pdfInfo:
 #A class to allow formatting for multiple pdfs in a certain folder. folderPath is a directory in a string with the pdfs in them
 class pdfFolder:
     def __init__(self, meetingDate):
-        self.folderPath = r'F:/D & L Committee/PLANNING SUB/PLANS/' + meetingDate + '/Decisions ' + meetingDate + "/"
+        self.folderPath = r'F:/D & L Committee/PLANNING SUB/PLANS/' + meetingDate + '/Decisions/'
         self.firstDecisionsList = []
         self.meetingDate = meetingDate
     
@@ -127,13 +130,13 @@ class createDocx:
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '*DATE*' in inline[i].text:
-                        text = inline[i].text.replace('*DATE*', self.titMeetingDate)
+                        text = inline[i].text.replace('*DATE*', self.titleMeetingDate)
                         inline[i].text = text
                 #print(p.text)
                 self.doc.save(self.filePath)
 
     def appendTable(self):
-        self.doc.tables
+        #self.doc.tables
         #print("Retrieved value: " + self.doc.tables[0].cell(0, 0).text)
         #self.doc.tables[0].cell(1, 0).text = "new value1"
         #self.doc.tables[0].add_row() #ADD ROW HERE
@@ -142,8 +145,12 @@ class createDocx:
         #self.doc.tables[0].cell(3, 2).text = "new value3"
         row = 1
         column = 0
+        #print(self.allDecisionList)
         for decisionList in self.allDecisionList:
             for s in decisionList:
+                if s == None:
+                    print("s equals None?")
+                    print(decisionList)
                 self.doc.tables[0].cell(row, column).text = s
                 column += 1
             row += 1

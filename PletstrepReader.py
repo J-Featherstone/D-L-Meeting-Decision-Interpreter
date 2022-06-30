@@ -24,8 +24,10 @@ class pletstrep:
         #self.latestFilePath = "F:/D & L Committee/PLANNING SUB/PLETRESP/" + self.latestFile
         #self.lastYearFilePath = "F:/D & L Committee/PLANNING SUB/PLETRESP/" + self.lastYearFile
 
-        self.latestFilePath = r"C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/" + self.latestFile
-        self.lastYearFilePath = r"C:/Users/JoeFeatherstone/Documents/Python Projects/D&L Meeting Decision Interpreter/" + self.lastYearFile
+        self.latestFilePath = r"F:/D & L Committee/PLANNING SUB/PLETRESP/" + self.latestFile
+        self.lastYearFilePath = r"F:/D & L Committee/PLANNING SUB/PLETRESP/" + self.lastYearFile
+
+        print(self.latestFilePath)
         
         self.doc1 = docx.Document(self.latestFilePath)
         self.doc2 = docx.Document(self.lastYearFilePath)
@@ -67,10 +69,10 @@ class pletstrep:
             return "No Comment"
         elif decision == "no comment":
             return "No Comment"
-        elif "objection" in decision:
-            return "Objection"
         elif "no objection" in decision:
             return "No Objection"
+        elif "objection" in decision:
+            return "Objection"
         else:
             return "Comment, please confirm manually."
 
